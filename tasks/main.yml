@@ -1,0 +1,117 @@
+---
+# tasks file for mebooks.ansible-role-docker-traefik
+
+- name: Directories
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+  - /etc/traefik
+  - /etc/traefik/htpasswd
+  - /etc/traefik/rules.d
+  - /var/log/traefik
+  tags:
+  - traefik
+  - reverse-proxy
+  - docker
+
+# Note that we can also drop rules into the configured
+# directory and have them apply dynamically
+# /etc/traefik/rules.d/rules.toml
+- name: Configuration files
+  template:
+    src: "traefik.toml.j2"
+    dest: "/etc/traefik/traefik.toml"
+  tags:
+  - traefik
+  - reverse-proxy
+  - docker
+
+- name: Install python pip
+  package:
+    name: python-pip
+  tags:
+  - traefik
+  - reverse-proxy
+  - docker
+
+- name: Requirements for htpasswd management
+  pip:
+    name: passlib
+  tags:
+  - traefik
+  - reverse-proxy
+  - docker
+
+- name: htpasswd file for Web UI authentification
+  htpasswd:
+    path: "/etc/traefik/htpasswd/traefik.{{domain}}"
+    name: "{{ item.username }}"
+    password: "{{ item.password }}"
+    crypt_scheme: sha256_crypt
+    owner: root
+    group: root
+    mode: 0600
+  with_items: '{{ users | default([]) }}'
+  when:
+  - '"acl" in item'
+  - '"traefik" in item.acl'
+  tags:
+  - traefik
+  - reverse-proxy
+  - docker
+
+# We alias port 8080 (the traefik web interface) to 9090
+# as otherwise we have problems with tomcat, which also
+# wants 8080 and is not easy to alias.
+- name: Container
+  docker_container:
+    name: traefik
+    image: traefik:1.4-alpine
+    restart_policy: unless-stopped
+    published_ports:
+    - "80:80"
+    - "443:443"
+    - "9090:8080"
+    volumes:
+    - /etc/localtime:/etc/localtime:ro
+    - /etc/traefik:/etc/traefik
+    - /var/log/traefik:/var/log/traefik
+    - /var/run/docker.sock:/var/run/docker.sock
+    capabilities:
+    - net_bind_service
+    labels:
+      traefik.enable: "true"
+      traefik.backend: traefik
+      traefik.frontend.rule: "Host:traefik.{{ domain }}"
+      traefik.port: "9090"
+  tags:
+  - traefik
+  - reverse-proxy
+  - docker
+
+- name: Whoami container for test
+  docker_container:
+    name: whoami
+    image: jwilder/whoami
+    restart_policy: unless-stopped
+    labels:
+      traefik.enable: "true"
+      traefik.backend: whoami
+      traefik.frontend.rule: "Host:whoami.{{ domain }}"
+      traefik.port: "8000"
+  when: traefik_testing
+  tags:
+  - traefik
+  - reverse-proxy
+  - docker
+
+
+- name: Install traefik logrotate
+  template:
+    src: ../templates/traefik.logrotate.d.j2
+    dest: /etc/logrotate.d/traefik
+  tags:
+  - traefik
+  - reverse-proxy
+  - docker

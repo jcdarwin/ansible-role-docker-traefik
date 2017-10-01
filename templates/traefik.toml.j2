@@ -1,0 +1,62 @@
+# defaultEntryPoints must be at the top because it should not be in any table below
+defaultEntryPoints = ["http", "https"]
+
+# Optional debug
+{% if traefik_testing %}
+debug = true
+{% endif %}
+
+[web]
+  # Port for the status page
+  address = ":9090"
+
+  [web.auth.basic]
+    usersFile = "/etc/traefik/htpasswd/traefik.{{domain}}"
+
+# Static (ansible or other generated) rules can be dropped in this folder
+[file]
+  directory = "/etc/traefik/rules.d"
+  watch = true
+
+# Entrypoints, http and https
+[entryPoints]
+
+  # http should be redirected to https
+  [entryPoints.http]
+    address = ":80"
+    [entryPoints.http.redirect]
+      entryPoint = "https"
+
+  # https is the default
+  [entryPoints.https]
+    address = ":443"
+    [entryPoints.https.tls]
+    # As we can now do basic auth per frontend, we don't need to
+    # do it across an entire entrypoint.
+    # https://blog.containo.us/traefik-1-3-get-some-more-raclette-1046664d862b#a34c
+    # [entryPoints.https.auth.basic]
+    # usersFile = "/etc/traefik/htpasswd/traefik.{{domain}}"
+
+# Enable ACME (Let's Encrypt): automatic SSL
+[acme]
+  email = "{{ email }}"
+  {% if traefik_testing %}
+  caServer = "https://acme-staging.api.letsencrypt.org/directory"
+  storage = "/etc/traefik/acme-staging.json"
+  acmeLogging = true
+  {% else %}
+  storage = "/etc/traefik/acme.json"
+  {% endif %}
+  entryPoint = "https"
+  # onDemand = true # not necessary since frontend / backend are included as labels in docker
+  OnHostRule = true
+
+[docker]
+  endpoint = "unix:///var/run/docker.sock"
+  domain = "{{domain}}"
+  watch = true
+  exposedbydefault = false
+
+# Only as of 1.4
+[accessLog]
+filePath = "/var/log/traefik/access.log"
