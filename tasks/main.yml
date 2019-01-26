@@ -67,7 +67,7 @@
 - name: Container
   docker_container:
     name: traefik
-    image: traefik:1.4-alpine
+    image: traefik:1.7-alpine
     restart_policy: unless-stopped
     published_ports:
     - "80:80"

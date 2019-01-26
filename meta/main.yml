@@ -41,8 +41,8 @@ galaxy_info:
     - reverseproxy
     - traefik
 
-dependencies: []
+dependencies:
   # List your role dependencies here, one per line.
   # Be sure to remove the '[]' above if you add dependencies
   # to this list.
-- mebooks.ansible-role-docker
+  - mebooks.ansible-role-docker
