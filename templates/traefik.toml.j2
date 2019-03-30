@@ -2,7 +2,7 @@
 defaultEntryPoints = ["http", "https"]
 
 # Optional debug
-{% if traefik_testing %}
+{% if traefik.traefik_testing %}
 debug = true
 {% endif %}
 
@@ -11,7 +11,7 @@ debug = true
   address = ":9090"
 
   [web.auth.basic]
-    usersFile = "/etc/traefik/htpasswd/traefik.{{domain}}"
+    usersFile = "/etc/traefik/htpasswd/traefik.{{ traefik.domain }}"
 
 # Static (ansible or other generated) rules can be dropped in this folder
 [file]
@@ -35,12 +35,12 @@ debug = true
     # do it across an entire entrypoint.
     # https://blog.containo.us/traefik-1-3-get-some-more-raclette-1046664d862b#a34c
     # [entryPoints.https.auth.basic]
-    # usersFile = "/etc/traefik/htpasswd/traefik.{{domain}}"
+    # usersFile = "/etc/traefik/htpasswd/traefik.{{ traefik.domain }}"
 
 # Enable ACME (Let's Encrypt): automatic SSL
 [acme]
-  email = "{{ email }}"
-  {% if traefik_testing %}
+  email = "{{ traefik.email }}"
+  {% if traefik.traefik_testing %}
   caServer = "https://acme-staging.api.letsencrypt.org/directory"
   storage = "/etc/traefik/acme-staging.json"
   acmeLogging = true
@@ -53,7 +53,7 @@ debug = true
 
 [docker]
   endpoint = "unix:///var/run/docker.sock"
-  domain = "{{domain}}"
+  domain = "{{ traefik.domain }}"
   watch = true
   exposedbydefault = false
 

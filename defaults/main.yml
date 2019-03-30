@@ -1,11 +1,13 @@
 ---
 # defaults file for mebooks.ansible-role-docker-traefik
-domain: domain.tld
-owner: admin
-email: whoever@example.com
+traefik:
+  domain: domain.tld
+  source: domain.tld
+  owner: admin
+  email: whoever@example.com
 
-users:
-  - username: admin
-    password: My own little 1 cloud !
-    acl:
-    - traefik
+  users:
+    - username: admin
+      password: My own little 1 cloud !
+      acl:
+      - traefik

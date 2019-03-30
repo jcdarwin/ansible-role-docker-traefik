@@ -19,13 +19,14 @@ Role Variables
 
 For let's encrypt certificate, and automatic reverse proxy
 
-- `domain` defaults to *domain.tld*
-- `owner`  defaults to *admin*
-- `email`  defaults to *whoever@example.com*
+- `traefik.domain` defaults to *domain.tld*
+- `traefik.source` defaults to *domain.tld*
+- `traefik.owner`  defaults to *admin*
+- `traefik.email`  defaults to *whoever@example.com*
 
-- `users.username` defaults to *admin*
-- `users.password` defaults to *My own little 1 cloud !*
-- `users.acl` defaults to *traefik*
+- `traefik.users.username` defaults to *admin*
+- `traefik.users.password` defaults to *My own little 1 cloud !*
+- `traefik.users.acl` defaults to *traefik*
 
 Dependencies
 ------------

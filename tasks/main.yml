@@ -45,14 +45,14 @@
 
 - name: htpasswd file for Web UI authentification
   htpasswd:
-    path: "/etc/traefik/htpasswd/traefik.{{domain}}"
+    path: "/etc/traefik/htpasswd/traefik.{{ traefik.domain }}"
     name: "{{ item.username }}"
     password: "{{ item.password }}"
     crypt_scheme: sha256_crypt
     owner: root
     group: root
     mode: 0600
-  with_items: '{{ users | default([]) }}'
+  with_items: '{{ traefik.users | default([]) }}'
   when:
   - '"acl" in item'
   - '"traefik" in item.acl'
@@ -70,21 +70,22 @@
     image: traefik:1.7-alpine
     restart_policy: unless-stopped
     published_ports:
-    - "80:80"
-    - "443:443"
-    - "9090:8080"
+      - "80:80"
+      - "443:443"
+      - "9090:8080"
     volumes:
-    - /etc/localtime:/etc/localtime:ro
-    - /etc/traefik:/etc/traefik
-    - /var/log/traefik:/var/log/traefik
-    - /var/run/docker.sock:/var/run/docker.sock
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/traefik:/etc/traefik
+      - /var/log/traefik:/var/log/traefik
+      - /var/run/docker.sock:/var/run/docker.sock
     capabilities:
-    - net_bind_service
+      - net_bind_service
     labels:
       traefik.enable: "true"
       traefik.backend: traefik
-      traefik.frontend.rule: "Host:traefik.{{ domain }}"
+      traefik.frontend.rule: "Host:traefik.{{ traefik.domain }}"
       traefik.port: "9090"
+      com.datadoghq.ad.logs: '[{"source": "do.mebooks.co.nz", "service": "traefik"}]'
   tags:
   - traefik
   - reverse-proxy
@@ -98,9 +99,9 @@
     labels:
       traefik.enable: "true"
       traefik.backend: whoami
-      traefik.frontend.rule: "Host:whoami.{{ domain }}"
+      traefik.frontend.rule: "Host:whoami.{{ traefik.domain }}"
       traefik.port: "8000"
-  when: traefik_testing
+  when: traefik.traefik_testing
   tags:
   - traefik
   - reverse-proxy

@@ -5,5 +5,6 @@
 # - spin up a whoami container accessible via whoami.{{domain}}
 # - use Let's Encrypt staging CA, otherwise rate limits may trigger
 # - enable logs
-traefik_testing: false
+traefik:
+  traefik_testing: false
 
