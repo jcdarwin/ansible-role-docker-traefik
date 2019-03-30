@@ -1,9 +1,14 @@
 ---
 # defaults file for mebooks.ansible-role-docker-traefik
 traefik:
+# For test purpose. If true
+# - spin up a whoami container accessible via whoami.{{domain}}
+# - use Let's Encrypt staging CA, otherwise rate limits may trigger
+# - enable logs
+  traefik_testing: true
+  owner: admin
   domain: domain.tld
   source: domain.tld
-  owner: admin
   email: whoever@example.com
 
   users:

@@ -41,15 +41,17 @@ debug = true
 [acme]
   email = "{{ traefik.email }}"
   {% if traefik.traefik_testing %}
-  caServer = "https://acme-staging.api.letsencrypt.org/directory"
+  caServer = "https://acme-staging-v02.api.letsencrypt.org/directory"
   storage = "/etc/traefik/acme-staging.json"
-  acmeLogging = true
   {% else %}
+  caServer = "https://acme-v02.api.letsencrypt.org/directory"
   storage = "/etc/traefik/acme.json"
   {% endif %}
+  acmeLogging = true
   entryPoint = "https"
   # onDemand = true # not necessary since frontend / backend are included as labels in docker
-  OnHostRule = true
+  onHostRule = true
+  [acme.tlsChallenge]
 
 [docker]
   endpoint = "unix:///var/run/docker.sock"

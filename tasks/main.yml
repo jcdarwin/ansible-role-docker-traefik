@@ -1,6 +1,13 @@
 ---
 # tasks file for mebooks.ansible-role-docker-traefik
 
+- name: Show the result of our vars
+  debug: var=traefik
+  tags:
+  - traefik
+  - reverse-proxy
+  - docker
+
 - name: Directories
   file:
     path: "{{ item }}"

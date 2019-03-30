@@ -1,10 +1,2 @@
 ---
 # vars file for mebooks.ansible-role-docker-traefik
-
-# For test purpose. If true
-# - spin up a whoami container accessible via whoami.{{domain}}
-# - use Let's Encrypt staging CA, otherwise rate limits may trigger
-# - enable logs
-traefik:
-  traefik_testing: false
-
