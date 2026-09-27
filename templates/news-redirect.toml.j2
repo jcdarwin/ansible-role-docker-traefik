@@ -1,0 +1,16 @@
+# Managed by Ansible (ansible-role-docker-traefik). Redirects news.{{ traefik.domain }}
+# to the blog's News section. Traefik 1.7 needs a backend for every frontend,
+# but the redirect middleware answers before the placeholder is ever contacted.
+[backends.news-redirect]
+  [backends.news-redirect.servers.placeholder]
+    url = "http://127.0.0.1:1"
+
+[frontends.news-redirect]
+  backend = "news-redirect"
+  entryPoints = ["http", "https"]
+  [frontends.news-redirect.routes.host]
+    rule = "Host:news.{{ traefik.domain }}"
+  [frontends.news-redirect.redirect]
+    regex = '^.*$'
+    replacement = "https://blog.{{ traefik.domain }}/news/"
+    permanent = true
