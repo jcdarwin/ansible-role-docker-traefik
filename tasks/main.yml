@@ -34,13 +34,13 @@
   - reverse-proxy
   - docker
 
-# news.<domain> redirects to the blog's News section. Picked up without a
-# restart, because the file provider watches rules.d. Needs a DNS record for
-# news.<domain> first, so ACME (onHostRule) can issue its certificate.
-- name: News subdomain redirect
-  template:
-    src: "news-redirect.toml.j2"
-    dest: "/etc/traefik/rules.d/news-redirect.toml"
+# news.<domain> used to redirect to the blog's News section. It's now its own
+# site on another server (the opencart-mebooks stack), so make sure the old
+# rule is gone. The file provider watches rules.d, so no restart is needed.
+- name: Remove the old News subdomain redirect
+  file:
+    path: "/etc/traefik/rules.d/news-redirect.toml"
+    state: absent
   tags:
   - traefik
   - reverse-proxy
